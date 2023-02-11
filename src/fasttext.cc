@@ -82,13 +82,13 @@ bool FastText::checkModel(std::istream& in) {
   return true;
 }
 
-void FastText::loadModel(const std::string& filename) {
-  std::ifstream ifs(filename, std::ifstream::binary);
+void FastText::loadModel() {
+  std::ifstream ifs("lid.176.ftz", std::ifstream::binary);
   if (!ifs.is_open()) {
-    throw std::invalid_argument(filename + " cannot be opened for loading!");
+    throw std::invalid_argument("Model cannot be opened for loading!");
   }
   if (!checkModel(ifs)) {
-    throw std::invalid_argument(filename + " has wrong file format!");
+    throw std::invalid_argument("Model has wrong file format!");
   }
   loadModel(ifs);
   ifs.close();

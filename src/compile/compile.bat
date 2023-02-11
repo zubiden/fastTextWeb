@@ -8,4 +8,6 @@ cd ../
 
 REM Compile the C++ 11 files and output the WebAssembly files 
 REM Optimization level 2 is being used, which hides some debugging/assertion information
-emcc --bind -o ../index.js args.cc matrix.cc dictionary.cc loss.cc productquantizer.cc densematrix.cc quantmatrix.cc vector.cc model.cc utils.cc meter.cc fasttext.cc main.cc -s NO_EXIT_RUNTIME -s WASM=0 -std=c++11 -O2
+REM Append next flags for debug mode -g -s ASSERTIONS -sNO_DISABLE_EXCEPTION_CATCHING -lembind -sEXPORT_EXCEPTION_HANDLING_HELPERS
+REM Use getExceptionMessage in JS to get message from error code https://emscripten.org/docs/porting/Debugging.html
+emcc --bind -o ../fasttext-wasm.js args.cc matrix.cc dictionary.cc loss.cc productquantizer.cc densematrix.cc quantmatrix.cc vector.cc model.cc utils.cc meter.cc fasttext.cc main.cc -s NO_EXIT_RUNTIME -s MODULARIZE=1 -s EXPORT_NAME='fasttextmodule' --embed-file lid.176.ftz -std=c++11 -O2

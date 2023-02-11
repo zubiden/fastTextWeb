@@ -7,6 +7,9 @@
 $ npm install fasttextweb
 ```
 
+## Changes
+**Sections below are mostly outdated.** This fork removed `loadModel` method and has built-in `lid.176.ftz` model for language detection. `std::cout` outputs were removed and results are passed as strings. Compilation result is a webpack-compatible module.
+
 ## Usage
 fastTextWeb only supports two commands, which helps keep the project files small. I chose to remove all of the other functions because they're not required in order to make predictions. This means that a potential user could train a model using vanilla fastText and then use fastTextWeb to deploy the model and form predictions on the web.
 

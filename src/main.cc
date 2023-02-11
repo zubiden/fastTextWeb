@@ -31,45 +31,49 @@ using namespace fasttext;
 // our instance of fastText
 static FastText fastTextInstance;
 
-void testFunction () {
-  std::cout << "The test function worked.";
-  std::cout << "\n";
+int isModelLoaded = 0;
+
+std::string testFunction () {
+  return "The test function worked.\n";
 }
 
-void printPredictions(
+std::string printPredictions(
     const std::vector<std::pair<real, std::string>>& predictions,
     bool printProb,
     bool multiline) {
+  std::stringstream ss;
   bool first = true;
   for (const auto& prediction : predictions) {
     if (!first && !multiline) {
-      std::cout << " ";
+      ss << " ";
     }
     first = false;
-    std::cout << prediction.second;
+    ss << prediction.second;
     if (printProb) {
-      std::cout << " " << prediction.first;
+      ss << " " << prediction.first;
     }
     if (multiline) {
-      std::cout << std::endl;
+      ss << std::endl;
     }
   }
   if (!multiline) {
-    std::cout << std::endl;
+    ss << std::endl;
   }
-  std::cout << "\n";
+
+  return ss.str();
 }
 
 // this function loads the model
-void loadModel(std::string filePath) {
-  // the file path will be the 3rd argument
-  fastTextInstance.loadModel(filePath);
-  std::cout << "The model has successfully been loaded!\n";
-  std::cout << "\n";
+void loadModel() {
+  if (isModelLoaded) return;
+  fastTextInstance.loadModel();
+  isModelLoaded = 1;
+  // std::cout << "The model has successfully been loaded!\n";
 }
 
 // this function will actually make a prediction
-void makePrediction(std::string predictionType, std::string textToClassify, std::string numPredictions, std::string thresholdValue) {
+std::string makePrediction(std::string predictionType, std::string textToClassify, std::string numPredictions, std::string thresholdValue) {
+  loadModel();
   int32_t k = std::stoi(numPredictions);
   real threshold = std::stof(thresholdValue);
   std::istringstream is(textToClassify);
@@ -78,10 +82,11 @@ void makePrediction(std::string predictionType, std::string textToClassify, std:
 
   std::istream& in = is;
   std::vector<std::pair<real, std::string>> predictions;
+  std::stringstream ss;
   while (fastTextInstance.predictLine(in, predictions, k, threshold)) {
-    printPredictions(predictions, printProb, false);
+    ss << printPredictions(predictions, printProb, true);
   }
-  std::cout << "\n";
+  return ss.str();
 }
 
 int main(int argc, char** argv) {
@@ -89,19 +94,15 @@ int main(int argc, char** argv) {
   #ifndef NODERAWFS
     // mount the current folder as a nodeFS instance
     EM_ASM(
-      FS.mkdir('/working');
-      FS.mount(NODEFS, { root: '.' }, '/working');
+      FS.mount(NODEFS, { root: '.' }, '.');
     );
   #endif
   // end nodeFS
-
-  std::cout << "\n";
   return 0;
 }
 
 // emscripten bindings
 EMSCRIPTEN_BINDINGS(myModule) {
   emscripten::function("testFunction", &testFunction);
-  emscripten::function("loadModel", &loadModel);
   emscripten::function("makePrediction", &makePrediction);
 }
